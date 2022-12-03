@@ -2,11 +2,11 @@
     "__version": "2.13.0",
     "new_vcsa": {
         "esxi": {
-            "hostname": "esxi_ip_here",
-            "username": "my_username",
-            "password": "my_password",
-            "deployment_network": "existing_vm_network_name_in_esxi",
-            "datastore": "existing_datastore_name_in_esxi"
+            "hostname": "esxi-01.lab",
+            "username": "root",
+            "password": "changethispassword",
+            "deployment_network": "VM Network",
+            "datastore": "datastore1"
         },
         "appliance": {
             "thin_disk_mode": true,
@@ -26,12 +26,12 @@
             ]
         },
         "os": {
-            "password": "my_password",
+            "password": "changethispassword",
             "ntp_servers": "time.cloudflare.com",
             "ssh_enable": false
         },
         "sso": {
-            "password": "my_password",
+            "password": "changethispassword",
             "domain_name": "vsphere.local"
         }
     },

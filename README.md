@@ -1,20 +1,75 @@
 # Overview
-Walkthrough for getting VMWare vSphere ESXi 8 and vCenter 8 running on your homelab.
+Walkthrough for getting VMWare vSphere ESXi 8 and vCenter 8 running on your homelab using the 60 day free evaluation license.
 
-This guide is part of a series that focuses on using infrastructure as code practices to handle as much configuration as possible. This part of the series is probably the least of the set in regards to IaC since it deals with bootstrapping physical hardware. The main goal of this series surrounds spinning up a multi-node Kubernetes cluster that runs a Jenkins instance for development purposes.
+This is part 1 of a multi-part series.
 
-For this guide, you will need to have an account created with vmware. A free account is all that is needed for this series. Create an account at [wmware.com](https://www.vmware.com)
+# The goal of this series
+This series is for you if you are interested in making management of your homelab something more turn-key. It is also for you if you are looking for something to help get hands-on experience to move from hobby tinkering to tools used in the workplace for managing infrastructure like Kubernetes clusters.
+
+The series is an end-to-end walkthrough from installing ESXi on bare metal up to having homelab tools (Jenkins, Kubernetes dashboard) running in a Kubernenetes cluster using infrastructure as code practices to allow you to spin up and manage this whole setup through terraform and ansible.
+
+Installing ESXi on new hardware to having a running Jenkins instance within a Kubernetes cluster can be yours within [TODO_UPDATE_THIS_WITH_TIME](timecheck.md)
+
+## Series Notes
+To keep this series managable, I will skip over basics of why and how to use tools like terraform and ansible - this series will jump in with just using the tools. If you are coming without a basic understanding of those tools, I would suggest running through some tutorials. There are fantastic write ups for those elsewhere.
+
+This is a walkthrough that is meant to be adapted to your network design and hardware. It is best suited for those that have a single homelab machine where ESXi will be installed directly on the hardware and a vCenter instance will be started up within the ESXi host.
+
+# This guide
+At the end of this guide, we will have a vSphere install in our homelab that will be the foundation of everything else to come. For this guide, you will need to have an account created with vmware. A free account is all that is needed for this series. Create an account at [wmware.com](https://www.vmware.com)
+
+This part of the series is probably the least of the set in regards to IaC since it deals with bootstrapping physical hardware and is also likely the least interesting of the series. At some point, I will come back and clean up the last few things to remove the manual cli steps relating to vCenter. Stick with the series and it should get a lot more interesting.
 
 
-# Note
-This is a walkthrough that is meant to be adapted to your network design and hardware. It is best suited for those that have a single homelab machine where ESXi will be installed directly on the hardware and a vCenter instance will be started up within the ESXi host. The ESXi host is set to a static ip of 192.168.2.10 with the hostname esxi-01.lab. The vCenter instance is set to static ip 192.168.2.12 and hostname vcsa-01.lab
+# Infrastructure Overview
+## Homelab hardware
+The hardware I am running on for this series is all consumer pc parts:
+- CPU: AMD Ryzen 5 5700*
+- Memory: 64GB DDR4*
+- Storage: 1TB Samsung 970 nvme
+
+* CPU - For a good experience, please have a cpu with at least 10 cpu threads/cores. With 4 Kubernetes nodes and vCenter running, anything less will be extremely cpu-constrained
+* Memory - Less than 64GB is fine. The series should work as-is with 32GB. Anything less will require small tweaks to VM definitions for the amount of memory we allocate to the Kubernetes nodes in the second part of this series.
+
+## Things we will be creating
+The infrastructure that will be created as a result of this entire series is as follows:
+
+- esxi host
+    - ip: 192.168.2.10
+    - hostname esxi-01.lab
+    - user: root
+    - password: changethispassword
+- vCenter instance running as a vm within esxi host
+    - ip: 192.168.2.12
+    - hostname: vcsa-01.lab
+    - user: administrator@vsphere.local
+    - password: changethispassword
+- kubenetes cluster with 1 control plane node and 3 worker nodes
+    - control plane:
+        - ip: 192.168.2.21
+        - hostname: c1-cp1.lab
+        - ssh: through ssh authorized key. user/pass disabled
+    - worker node 1:
+        - ip: 192.168.2.31
+        - hostname: c1-node1.lab
+        - ssh: through ssh authorized key. user/pass disabled
+    - worker node 2:
+        - ip: 192.168.2.32
+        - hostname: c1-node2.lab
+        - ssh: through ssh authorized key. user/pass disabled
+    - worker node 3:
+        - ip: 192.168.2.33
+        - hostname: c1-node3.lab
+        - ssh: through ssh authorized key. user/pass disabled
 
 
 # Guide
+1. Clone this repo to your computer
 1. [Install ESXi 8](#install-esxi-8)
 1. [Setup before vCenter](#setup-before-vcenter)
-2. [Installing vCenter on an ESXi host](#installing-vcenter-on-an-esxi-host) or [Installing vCenter from Windows](README-win.md)
-4. [Finish settings up vCenter](#finish-settings-up-vcenter)
+1. [Installing vCenter on an ESXi host](#installing-vcenter-on-an-esxi-host) or [Installing vCenter from Windows](README-win.md)
+1. [Finish settings up vCenter](#finish-settings-up-vcenter)
+1. [Wrap Up](#wrap-up)
 
 
 # Install ESXi 8
@@ -33,13 +88,13 @@ This is a walkthrough that is meant to be adapted to your network design and har
 
 
 # Setup before vCenter
-A DNS record for vCenter should be setup before running the installer. There are a number of ways to do this and it's up to the reader on how best to accomplish this. I run dnsmasq in a container with a very basic config file and it has been running great.
+A DNS record for vCenter should be setup before running the installer. There are a number of ways to do this and it's up to the reader on how best to accomplish this but I'll probably write this up in another guide. Currently, I run dnsmasq in a container with a very basic config file and it has been running great.
 
 A previous method I used that I'll include here is for anyone using an edgerouter and wishing to use static host mapping
 
 ### EdgeOS A record creation
 1. SSH to router
-2. Run the following commands:
+1. Run the following commands:
     ```
     configure
     set system static-host-mapping host-name <hostname of vSphere> inet <static ip of vSphere>
@@ -64,6 +119,8 @@ A previous method I used that I'll include here is for anyone using an edgeroute
     ```
 
 # Installing vCenter on an ESXi host
+For installing vCenter, we will focus on using their cli-based installer with a config file that would generally be placed into git for source control. This piece is one of the last pieces this series does not have automated but until then, here are the manual steps.
+
 1. Download the vCenter 8 iso image from wmware [[site](https://customerconnect.vmware.com/en/downloads/info/slug/datacenter_cloud_infrastructure/vmware_vsphere/8_0)]
 1. Verify the sha256 checksum of the downloaded image against the stated checksum
     ```
@@ -75,7 +132,8 @@ A previous method I used that I'll include here is for anyone using an edgeroute
     ```
     chmod +x vcsa-deploy
     ```
-1. Run config validators (with replacement of your config json file based off of examples/vsphere-cli.json)
+1. Edit [examples/vsphere-cli.json](examples/vsphere-cli.json), if needed, with changes related to your network design and configuration
+1. Run config validators
     ```
     ./vcsa-deploy install --accept-eula --acknowledge-ceip --verify-template-only ./examples/vsphere-cli.json
     ./vcsa-deploy install --accept-eula --acknowledge-ceip --precheck-only ./examples/vsphere-cli.json
@@ -83,7 +141,7 @@ A previous method I used that I'll include here is for anyone using an edgeroute
 1. If there were any error messages related to ovftool being not found, it is likely you need to install the dependencies mentioned below
     1. Install ovftool from https://customerconnect.vmware.com/downloads/get-download?downloadGroup=OVFTOOL443&download=true&fileId=43493035a4d43d3306fdb7c6ee61df29&uuId=edea95e1-2486-4298-afe6-28099de84bd6
     1. Install libcrypt `yay -S libxcrypt-compat`
-1. Install vCenter (with replacement of your config json file based off of examples/vsphere-cli.json)
+1. Install vCenter
     ```
     ./vcsa-deploy install --accept-eula --acknowledge-ceip ./examples/vsphere-cli.json
     ```
@@ -91,10 +149,10 @@ A previous method I used that I'll include here is for anyone using an edgeroute
 # Finish settings up vCenter
 Time to use terraform to manage a few vSphere objects.
 
-Let's create a data center, cluster, and add our ESXi host to the cluster.See [main.tf](main.tf) for details.
+Let's create a data center, cluster, and add our ESXi host to the cluster. See [main.tf](main.tf) for details.
 
-1. Edit [examples/terraform.tfvars](examples/terraform.tfvars) with your vSphere settings
-2. Create a terraform workspace and apply the changes
+1. Edit [examples/terraform.tfvars](examples/terraform.tfvars), if needed, with changes related to your network design and configuration
+1. Create a terraform workspace and apply the changes
     ```
     terraform workspace new vsphere
     terraform workspace select vsphere
@@ -104,4 +162,11 @@ Let's create a data center, cluster, and add our ESXi host to the cluster.See [m
 
 
 # Wrap Up
-You should have have a working ESXi machine that is running an instance of vCenter. The next part of this series will continue with steps to create the virtual machines we will use for our Kubernetes cluster.
+You should have have a working ESXi machine that is running an instance of vCenter. 
+
+- ESXi host should be available by logging in at [https://esxi-01.lab](https://esxi-01.lab) with the example user `root` and password `changethispassword` unless this was customized earlier.
+- vCenter host should be available by logging in at [https://vcsa-01.lab](https://vcsa-01.lab) with the example user `administrator@vsphere.local` and password `changethispassword` unless this was also customized earlier.
+
+Note - Certificate issues are expected for the above urls as we are using a .lab domain. A future update to the guide might improve this.
+
+The next part of this series will continue with steps to create the virtual machines we will use for our Kubernetes cluster.
