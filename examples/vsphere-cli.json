@@ -1,0 +1,43 @@
+{
+    "__version": "2.13.0",
+    "new_vcsa": {
+        "esxi": {
+            "hostname": "esxi_ip_here",
+            "username": "my_username",
+            "password": "my_password",
+            "deployment_network": "existing_vm_network_name_in_esxi",
+            "datastore": "existing_datastore_name_in_esxi"
+        },
+        "appliance": {
+            "thin_disk_mode": true,
+            "deployment_option": "tiny",
+            "name": "vcsa-01.lab"
+        },
+        "network": {
+            "ip_family": "ipv4",
+            "mode": "static",
+            "system_name": "vcsa-01.lab",
+            "ip": "192.168.2.12",
+            "prefix": "24",
+            "gateway": "192.168.2.1",
+            "dns_servers": [
+                "192.168.2.1",
+                "1.1.1.1"
+            ]
+        },
+        "os": {
+            "password": "my_password",
+            "ntp_servers": "time.cloudflare.com",
+            "ssh_enable": false
+        },
+        "sso": {
+            "password": "my_password",
+            "domain_name": "vsphere.local"
+        }
+    },
+    "ceip": {
+        "settings": {
+            "ceip_enabled": false
+        }
+    }
+}
