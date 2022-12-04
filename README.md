@@ -133,10 +133,7 @@ A previous method I used that I'll include here is for anyone using edgeos on a 
 1. Select `DNS Configuration` and update the DNS servers if neccessary. Set the hostname value to `esxi-01.lab` and hit `Enter` when done
 1. Select `Custom DNS Suffixes` and type `lab` and hit `Enter`
 1. Hit `Esc` and then hit `y` to apply the networking changes
-1. Launch [https://esxi-01.lab](https://esxi-01.lab) and test a login with `root` and `changethisp455word!`
-
-
-# Setup before vCenter
+1. Launch [https://esxi-01.lab](https://esxi-01.lab) on a different computer than the ESXi host and test a login with `root` and `changethisp455word!`
 
 
 # Installing vCenter on an ESXi host
