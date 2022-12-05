@@ -152,6 +152,8 @@ Let's install ESXi directly on our hardware and use it as our hypervisor.
 1. Hit `Esc` and then hit `y` to apply the networking changes
 1. Launch [https://esxi-01.lab](https://esxi-01.lab) on a different computer than the ESXi host and test a login with `root` and `changethisp455word!`<br/>
     ![esxi-ui-login](https://perdue.dev/content/images/2022/12/esxi-ui-login.png)
+1. After logging in, you are greeted with your working ESXi instance
+    ![esxi-ui-login-success](https://perdue.dev/content/images/2022/12/esxi-ui-login-success.png)
 
 
 # Installing vCenter on an ESXi host
@@ -213,7 +215,7 @@ For installing vCenter, we will focus on using their cli-based installer with a 
         }
     }
     ```
-1. Run config validators and type `1` to accept the untrusted SSL message since we do not have a signed certificate
+1. Run config validators and type `1` and then `Enter` to accept the untrusted SSL message since we do not have a signed certificate
     ```
     ./vcsa-deploy install --accept-eula --acknowledge-ceip --verify-template-only ./examples/vsphere-cli.json
     ./vcsa-deploy install --accept-eula --acknowledge-ceip --precheck-only ./examples/vsphere-cli.json
@@ -231,16 +233,21 @@ For installing vCenter, we will focus on using their cli-based installer with a 
 1. After 10 or 20 minutes, the installer should complete<br/>
     ![vcenter-cli-install-complete](https://perdue.dev/content/images/2022/12/vcenter-cli-install-complete.png)
 
-1. Launch [https://vcsa-01.lab](https://vcsa-01.lab) and test a login with `administrator@vsphere.local` and `changethisP455word!`<br/>
+1. Open [https://vcsa-01.lab](https://vcsa-01.lab) and click the button to `Launch vSphere Client` and login with `administrator@vsphere.local` and `changethisP455word!`<br/>
     ![vsphere-ui-login](https://perdue.dev/content/images/2022/12/vsphere-ui-login.png)
+1. After login, we are greeted with our ready to use vCenter instance
+    ![vsphere-login-success](https://perdue.dev/content/images/2022/12/vsphere-login-success.png)
+1. Our [esxi-01 host](https://esxi-01.lab) can also be launched where we would see our vCenter server appliance running as a VM
+    ![esxi-ui-vsphere-shown](https://perdue.dev/content/images/2022/12/esxi-ui-vsphere-shown.png)
 
 
 # Finish settings up vCenter
-Time to use terraform to manage a few vSphere objects.
+Time to use terraform to manage a few vSphere objects using the vSphere terraform provider mentioned earlier.
 
-Let's create a data center, cluster, and add our ESXi host to the cluster. See [main.tf](main.tf) for details.
+Let's create a data center, cluster, and add our ESXi host to the cluster. See [main.tf](https://github.com/markperdue/vsphere-setup/blob/main/main.tf) for details.
 
-1. Edit [examples/terraform.tfvars](https://github.com/markperdue/vsphere-setup/blob/main/examples/terraform.tfvars), if needed, with changes related to your network design and configuration
+1. In a terminal, navigate to where the [companion code repo](https://github.com/markperdue/vsphere-setup) was checked out to
+2. Edit [examples/terraform.tfvars](https://github.com/markperdue/vsphere-setup/blob/main/examples/terraform.tfvars), if needed, with changes related to your network design and configuration
     ```
     # example file from companion code repo
     vsphere_user       = "administrator@vsphere.local"
@@ -252,16 +259,52 @@ Let's create a data center, cluster, and add our ESXi host to the cluster. See [
     host_username      = "root"
     host_password      = "changethisp455word!"
     ```
-1. Create a terraform workspace and apply the changes
+1. Create a terraform workspace and init our plan
     ```
     terraform workspace new vsphere
     terraform init
+    ```
+    <br/>![terraform-vsphere-workspace-init-1](https://perdue.dev/content/images/2022/12/terraform-vsphere-workspace-init-1.png)
+1. Looking at the companion code repo's [main.tf](https://github.com/markperdue/vsphere-setup/blob/main/main.tf) file we can see we are going to creates 3 resources using the vsphere terraform provider
+    ```
+    provider "vsphere" {
+      user                 = var.vsphere_user
+      password             = var.vsphere_password
+      vsphere_server       = var.vsphere_server
+      allow_unverified_ssl = true
+    }
+
+    resource "vsphere_datacenter" "vsphere_datacenter" {
+      name = var.vsphere_datacenter
+    }
+
+    resource "vsphere_compute_cluster" "compute_cluster" {
+      name          = var.vsphere_cluster
+      datacenter_id = vsphere_datacenter.vsphere_datacenter.moid
+      host_managed  = true
+    }
+
+    resource "vsphere_host" "esxi-01" {
+      hostname   = var.host_hostname
+      username   = var.host_username
+      password   = var.host_password
+      cluster    = vsphere_compute_cluster.compute_cluster.id
+      thumbprint = data.vsphere_host_thumbprint.this.id
+    }
+    ```
+1. Have terraform apply the plan with our `tfvars` configuration file
+    ```
     terraform apply --var-file=examples/terraform.tfvars
-    ```<br/>
+    ```
+    <br/>![terraform-vsphere-apply-1-1](https://perdue.dev/content/images/2022/12/terraform-vsphere-apply-1-1.png)
+1. Terraform will detect our current infrastructure does not match our definition and that to match our definition, 3 resources - a datacenter, cluster, and host resources - need to be created. Type `yes` and hit `Enter` after confirming the displayed info
+    ![terraform-vsphere-apply-2-1](https://perdue.dev/content/images/2022/12/terraform-vsphere-apply-2-1.png)
+1. We can verify the terraform resources were created by visiting [https://vcsa-01.lab](https://vcsa-01.lab). The new resources should be visible in the datacenter panel
+    ![vsphere-terraform-post-changes](https://perdue.dev/content/images/2022/12/vsphere-terraform-post-changes.png)
 
 
 # Wrap Up
-You should have have a working ESXi machine that is running an instance of vCenter. 
+You should now have a working ESXi machine that is running an instance of vCenter. 
 
 - ESXi host should be available by logging in at [https://esxi-01.lab](https://esxi-01.lab) with the example user `root` and password `changethisp455word!`
 - vCenter host should be available by logging in at [https://vcsa-01.lab](https://vcsa-01.lab) with the example user `administrator@vsphere.local` and password `changethisP455word!`
