@@ -39,7 +39,7 @@ The infrastructure that will be created as a result of this entire series is as 
 
 
 # Guide
-1. [Get compananion code](#get-companion-code)
+1. [Get companion code](#get-companion-code)
 1. [(optional) Setup local DNS](#optional-setup-local-dns)
 1. [Install ESXi 8](#install-esxi-8)
 1. [Installing vCenter on an ESXi host](#installing-vcenter-on-an-esxi-host) or [Installing vCenter from Windows](https://github.com/markperdue/vsphere-setup/blob/main/blog/post-win.md)
