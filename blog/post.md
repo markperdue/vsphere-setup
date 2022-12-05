@@ -7,7 +7,7 @@ This series is for you if you are interested in making management of your homela
 
 The series is an end-to-end walkthrough from installing ESXi on bare metal up to having homelab tools (Jenkins, Kubernetes dashboard) running in a Kubernenetes cluster using infrastructure as code practices to allow you to spin up and manage this whole setup through terraform and ansible.
 
-Installing ESXi on new hardware to having a running Jenkins instance within a Kubernetes cluster can be yours within [TODO_UPDATE_THIS_WITH_TIME](timecheck.md)
+Installing ESXi on new hardware to having a running Jenkins instance within a Kubernetes cluster can be yours within [TODO_UPDATE_THIS_WITH_TIME](https://github.com/markperdue/vsphere-setup/blob/main/blog/timecheck.md)
 
 ## Series Notes
 To keep this series managable, I will skip over basics of why and how to use tools like terraform and ansible - this series will jump right in using the tools. If you are coming without a basic understanding of those tools, I would suggest running through some tutorials. There are fantastic write ups for those elsewhere.
@@ -67,7 +67,7 @@ The infrastructure that will be created as a result of this entire series is as 
 1. [Get compananion code](#get-companion-code)
 1. [(optional) Setup local DNS](#optional-setup-local-dns)
 1. [Install ESXi 8](#install-esxi-8)
-1. [Installing vCenter on an ESXi host](#installing-vcenter-on-an-esxi-host) or [Installing vCenter from Windows](README-win.md)
+1. [Installing vCenter on an ESXi host](#installing-vcenter-on-an-esxi-host) or [Installing vCenter from Windows](https://github.com/markperdue/vsphere-setup/blob/main/blog/post-win.md)
 1. [Finish settings up vCenter](#finish-settings-up-vcenter)
 1. [Wrap Up](#wrap-up)
 

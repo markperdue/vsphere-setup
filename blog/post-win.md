@@ -1,4 +1,4 @@
-# Installing vSphere from Windows
+# Installing vSphere vCenter from Windows
 
 1. Download [VMware-VCSA-all-8.0.0-20519528.iso](https://customerconnect.vmware.com/en/downloads/details?downloadGroup=VC800&productId=1345&rPId=97539) or desired VCSA file
 1. Double click to mount the image
@@ -36,8 +36,8 @@ SSH access: Disabled
 Create a new SSO domain
 Single Sign-On domain name: vsphere.local
 Single Sign-On username: administrator
-Single Sing-On password: <enter password>
-Confirm password: <re-enter password>
+Single Sing-On password: changethisP455word!
+Confirm password: changethisP455word!
 ```
 1. Uncheck `Join the VMWare's CEIP` and click `Next`
 1. Review settings and click `Finish`
