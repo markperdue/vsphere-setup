@@ -7,7 +7,9 @@ This series is for you if you are interested in making management of your homela
 
 The series is an end-to-end walkthrough from installing ESXi on bare metal up to having homelab tools (Jenkins, Kubernetes dashboard) running in a Kubernenetes cluster using infrastructure as code practices to allow you to spin up and manage this whole setup through terraform and ansible.
 
-Installing ESXi on new hardware to having a running Jenkins instance within a Kubernetes cluster can be yours within [TODO_UPDATE_THIS_WITH_TIME](https://github.com/markperdue/vsphere-setup/blob/main/blog/timecheck.md)
+The end-state Kubernetes cluster we will be creating will have some developer-focused tools deployed which will be described in more detail in part 4. All tools are deployed from code.
+![homelab_tools-1](https://perdue.dev/content/images/2022/12/homelab_tools-1.png)
+
 
 ## Series Notes
 To keep this series managable, I will skip over basics of why and how to use tools like terraform and ansible - this series will jump right in using the tools. If you are coming without a basic understanding of those tools, I would suggest running through some tutorials. There are fantastic write ups for those elsewhere.
@@ -33,34 +35,7 @@ The hardware I am running on for this series is all consumer pc parts:
 
 ## Things we will be creating
 The infrastructure that will be created as a result of this entire series is as follows:
-
-- ESXi host
-    - ip: 192.168.2.10
-    - hostname esxi-01.lab
-    - user: root
-    - password: changethisp455word!
-- vCenter instance running as a VM within ESXi host
-    - ip: 192.168.2.12
-    - hostname: vcsa-01.lab
-    - user: administrator@vsphere.local
-    - password: changethisP455word!
-- Kubenetes cluster with 1 control plane node and 3 worker nodes (all running as VMs within the ESXi host)
-    - control plane:
-        - ip: 192.168.2.21
-        - hostname: c1-cp1.lab
-        - ssh: through ssh authorized key. user/pass disabled
-    - worker node 1:
-        - ip: 192.168.2.31
-        - hostname: c1-node1.lab
-        - ssh: through ssh authorized key. user/pass disabled
-    - worker node 2:
-        - ip: 192.168.2.32
-        - hostname: c1-node2.lab
-        - ssh: through ssh authorized key. user/pass disabled
-    - worker node 3:
-        - ip: 192.168.2.33
-        - hostname: c1-node3.lab
-        - ssh: through ssh authorized key. user/pass disabled
+![homelab-1](https://perdue.dev/content/images/2022/12/homelab-1.png)
 
 
 # Guide
@@ -157,7 +132,7 @@ Let's install ESXi directly on our hardware and use it as our hypervisor.
 
 
 # Installing vCenter on an ESXi host
-In part 2 of this series, we will be using the [vSphere terraform provider](https://registry.terraform.io/providers/hashicorp/vsphere/latest/docs) to manage our virtual machines so let's get vSphere vCenter installed. We will install vCenter as a server appliance within the ESXi host we created for our homelab. vCenter requires a lot of memory to run, 14GB by default, so if that is a concern based on your available homelab I have a tip - things seem to work for our terraform use case by setting the vCenter VM to use at least 4GB memory - albeit things start up much slower. If you have the memory to spare, keep things as their our by default.
+In part 2 of this series, we will be using the [vSphere terraform provider](https://registry.terraform.io/providers/hashicorp/vsphere/latest/docs) to manage our virtual machines so let's get vSphere vCenter installed. We will install vCenter as a server appliance within the ESXi host we created for our homelab. vCenter requires a lot of memory to run, 14GB by default, so if that is a concern based on your available homelab I have a tip - things seem to work for our terraform use case by setting the vCenter VM to use at least 4GB memory - albeit things start up much slower. If you have the memory to spare, keep things as they are by default.
 
 For installing vCenter, we will focus on using their cli-based installer with a config file that would generally be placed into git for source control. This piece is one of the last pieces this series does not have automated, but until then, here are the manual steps.
 
