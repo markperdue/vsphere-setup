@@ -1,0 +1,1 @@
+For the best viewing experience, please see the live version of this post at [Using VMWare ESXi 8 and vCenter 8 in your homelab for free](https://perdue.dev/using-vmware-esxi-8-and-vcenter-8-in-your-homelab-for-free/)
