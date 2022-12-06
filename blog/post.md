@@ -17,7 +17,7 @@ To keep this series managable, I will skip over basics of why and how to use too
 This is a walkthrough that is meant to be adapted to your network design and hardware. It is best suited for those that have a single homelab machine where ESXi will be installed directly on the hardware and a vCenter instance will be started up within the ESXi host. Also, it should go without needing to say it, but this is not production grade - things like valid tls certificates are not included.
 
 # This guide
-At the end of this guide, we will have a vSphere install in our homelab that will be the foundation of everything else to come. For this guide, you will need to have an account created with vmware. A free account is all that is needed for this series. Create an account at [wmware.com](https://www.vmware.com)
+At the end of this guide, we will have a vSphere install in our homelab that will be the foundation of everything else to come. For this guide, you will need to have an account created with vmware. A free account is all that is needed for this series. Create an account at [wvmware.com](https://www.vmware.com)
 
 This part of the series is probably the least of the set in regards to IaC since it deals with bootstrapping physical hardware and is also likely the least interesting of the series. At some point, I will come back and clean up the last few things to remove the manual cli steps relating to vCenter. Stick with the series and it should get a lot more interesting.
 
