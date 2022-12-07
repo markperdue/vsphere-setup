@@ -4,7 +4,7 @@
         "esxi": {
             "hostname": "esxi-01.lab",
             "username": "root",
-            "password": "changethisp455word!",
+            "password": "changethisP455word!",
             "deployment_network": "VM Network",
             "datastore": "datastore1"
         },
