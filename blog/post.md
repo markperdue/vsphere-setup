@@ -160,8 +160,7 @@ For installing vCenter, we will focus on using their cli-based installer with a 
                 "prefix": "24",
                 "gateway": "192.168.2.1",
                 "dns_servers": [
-                    "192.168.1.10",
-                    "1.1.1.1"
+                    "192.168.1.10"
                 ]
             },
             "os": {
