@@ -1,6 +1,6 @@
 Walkthrough for getting VMWare vSphere ESXi 8 and vCenter 8 running on your homelab using the 60 day free evaluation license.
 
-This is part 1 of a multi-part series.
+This is part 1 of a multi-part series. Part 2 is [Creating VMs for Kubernetes Using Terraform and VMWare vSphere](https://perdue.dev/creating-vms-for-kubernetes-using-terraform-and-vmware-vsphere/)
 
 # The goal of this series
 This series is for you if you are interested in making management of your homelab something more turn-key. It is also for you if you are looking for something to help get hands-on experience to move from hobby tinkering to tools used in the workplace for managing infrastructure like Kubernetes clusters.
@@ -330,4 +330,4 @@ You should now have a working ESXi machine that is running an instance of vCente
 
 Note - Certificate issues are expected for the above urls as we are using a .lab domain. A future update to the guide might improve this.
 
-The next part of this series will continue with steps to create the virtual machines we will use for our Kubernetes cluster.
+The next part of this series will continue with steps to create the virtual machines we will use for our Kubernetes cluster. Continue with part 2 at [Creating VMs for Kubernetes Using Terraform and VMWare vSphere](https://perdue.dev/creating-vms-for-kubernetes-using-terraform-and-vmware-vsphere/)
